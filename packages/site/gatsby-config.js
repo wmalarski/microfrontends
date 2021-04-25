@@ -1,3 +1,3 @@
 module.exports = {
-  plugins: ["gatsby-auth", "gatsby-blog"],
+  plugins: ["gatsby-theme-blog-auth", "gatsby-theme-blog-posts"],
 };

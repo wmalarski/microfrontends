@@ -1,11 +1,11 @@
-import React from "react";
 import { Link } from "gatsby";
+import React from "react";
 
 export default function Index() {
   return (
     <>
       <h1>Hello</h1>
-      <Link to="/app/blog">Blog</Link>
+      <Link to="/app/posts">Blog</Link>
     </>
   );
 }
