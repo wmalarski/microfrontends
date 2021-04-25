@@ -1,0 +1,19 @@
+{
+  "private": true,
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "workspaces": [
+    "packages/*"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wmalarski/microfrontends.git"
+  },
+  "author": "wmalarski@gmail.com",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/wmalarski/microfrontends/issues"
+  },
+  "homepage": "https://github.com/wmalarski/microfrontends#readme"
+}
