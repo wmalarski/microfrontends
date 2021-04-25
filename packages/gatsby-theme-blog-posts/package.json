@@ -14,7 +14,8 @@
     "react-dom": "^17.0.2",
     "gatsby-plugin-page-creator": "^3.3.0",
     "gatsby-plugin-typescript": "^3.3.0",
-    "gatsby-theme-blog-common": "*"
+    "gatsby-theme-blog-common": "*",
+    "gatsby-source-contentful": "^5.3.0"
   },
   "devDependencies": {
     "@types/react": "^17.0.3",
@@ -42,6 +43,7 @@
     "babel-jest": "^26.6.3",
     "jest": "^26.6.3",
     "react-test-renderer": "^17.0.2",
-    "ts-jest": "^26.5.5"
+    "ts-jest": "^26.5.5",
+    "dotenv": "^8.2.0"
   }
 }
