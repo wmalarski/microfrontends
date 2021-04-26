@@ -1,6 +1,4 @@
-// import { config } from "dotenv";
-
-// eslint-disable-next-line @typescript-eslint/no-var-requires
+/* eslint-disable @typescript-eslint/no-var-requires */
 require("dotenv").config({
   path: `.env.${process.env.NODE_ENV}`,
   debug: true
