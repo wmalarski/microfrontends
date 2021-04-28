@@ -1,18 +1,11 @@
 import { GatsbyNode } from "gatsby";
 import { resolve } from "path";
+import { authorPath, postPath, postsPath } from "./src/paths";
+import { PostNode } from "./src/types";
 import { chunk, groupBy } from "./src/utils";
 
 const requestPageSize = 100;
 const paginationSize = 10;
-
-interface PostNode {
-  id: string;
-  title: string;
-  author: {
-    id: string;
-    name: string;
-  };
-}
 
 async function fetchPosts({ graphql, skip }): Promise<PostNode[]> {
   const result = await graphql(
@@ -63,28 +56,13 @@ export const createPages: GatsbyNode["createPages"] = async ({
   const blogPage = resolve(templates, "PostsTemplate.tsx");
   const authorPage = resolve(templates, "AuthorTemplate.tsx");
 
-  const postPath = (title: string): string =>
-    `app/posts/${title.replace(/ /g, "-").toLowerCase()}/`;
-  const pagePath = (page: number): string =>
-    `app/posts${page === 0 ? "" : `/page/${page + 1}`}`;
-  const authorPagePath = (author: string, page: number): string =>
-    `app/author/${author.replace(/ /g, "-").toLowerCase()}${
-      page === 0 ? "" : `/page/${page + 1}`
-    }`;
-
   // Post pages
-  const postNodes = (await fetchPosts({ graphql, skip: 0 })).map(post => ({
-    authorPage: authorPagePath(post.author.name, 0),
-    ...post
-  }));
+  const postNodes = await fetchPosts({ graphql, skip: 0 });
   postNodes.forEach(post =>
     createPage({
-      path: postPath(post.title),
+      path: postPath(post.title).slice(1),
       component: blogPost,
-      context: {
-        id: post.id,
-        authorPath: post.authorPage
-      }
+      context: { id: post.id }
     })
   );
 
@@ -92,15 +70,18 @@ export const createPages: GatsbyNode["createPages"] = async ({
   const nodeChunks = chunk(postNodes, paginationSize);
   nodeChunks.forEach((posts, index) =>
     createPage({
-      path: pagePath(index),
+      path: postsPath(index).slice(1),
       component: blogPage,
       context: {
         posts,
-        currentPage: index,
-        pageSize: paginationSize,
-        pageCount: nodeChunks.length,
-        prevPath: index === 0 ? null : pagePath(index - 1),
-        nextPath: index === nodeChunks.length - 1 ? null : pagePath(index + 1)
+        pageInfo: {
+          currentPage: index,
+          pageSize: paginationSize,
+          pageCount: nodeChunks.length,
+          prevPath: index === 0 ? null : postsPath(index - 1),
+          nextPath:
+            index === nodeChunks.length - 1 ? null : postsPath(index + 1)
+        }
       }
     })
   );
@@ -110,21 +91,23 @@ export const createPages: GatsbyNode["createPages"] = async ({
   Object.entries(authors).forEach(([authorId, postsNodes]) => {
     const authorName = postsNodes[0].author.name;
     const authorChunks = chunk(postsNodes, paginationSize);
-    Object.entries(authorChunks).forEach((posts, index) =>
+    authorChunks.forEach((posts, index) =>
       createPage({
-        path: authorPagePath(authorName, index),
+        path: authorPath(authorName, index).slice(1),
         component: authorPage,
         context: {
-          authorId,
+          id: authorId,
           posts,
-          currentPage: index,
-          pageSize: paginationSize,
-          pageCount: authorChunks.length,
-          prevPath: index === 0 ? null : authorPagePath(authorName, index - 1),
-          nextPath:
-            index === authorChunks.length - 1
-              ? null
-              : authorPagePath(authorName, index + 1)
+          pageInfo: {
+            currentPage: index,
+            pageSize: paginationSize,
+            pageCount: authorChunks.length,
+            prevPath: index === 0 ? null : authorPath(authorName, index - 1),
+            nextPath:
+              index === authorChunks.length - 1
+                ? null
+                : authorPath(authorName, index + 1)
+          }
         }
       })
     );

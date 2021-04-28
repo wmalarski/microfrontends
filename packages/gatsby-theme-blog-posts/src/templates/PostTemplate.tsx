@@ -12,7 +12,7 @@ export default function PostTemplate(props: PageProps): JSX.Element {
 
 export const pageQuery = graphql`
   query BlogPostBySlug($id: String!) {
-    contentfulPost(id: { eq: $id }) {
+    post: contentfulPost(id: { eq: $id }) {
       createdAt
       id
       title
