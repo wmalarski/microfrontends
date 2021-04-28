@@ -1,10 +1,8 @@
-import { graphql } from "gatsby";
+import { graphql, PageProps } from "gatsby";
 import Layout from "gatsby-theme-blog-common/src/components/Layout";
 import React from "react";
 
-export default function PostTemplate(props: any): JSX.Element {
-  console.log("PostTemplate", props);
-
+export default function PostTemplate(props: PageProps): JSX.Element {
   return (
     <Layout>
       <pre>{JSON.stringify(props, null, 2)}</pre>
