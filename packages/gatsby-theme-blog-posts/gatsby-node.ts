@@ -1,6 +1,6 @@
 import { GatsbyNode } from "gatsby";
 import { resolve } from "path";
-import { chunk } from "./src/utils";
+import { chunk, groupBy } from "./src/utils";
 
 const requestPageSize = 100;
 const paginationSize = 10;
@@ -8,6 +8,10 @@ const paginationSize = 10;
 interface PostNode {
   id: string;
   title: string;
+  author: {
+    id: string;
+    name: string;
+  };
 }
 
 async function fetchPosts({ graphql, skip }): Promise<PostNode[]> {
@@ -57,24 +61,36 @@ export const createPages: GatsbyNode["createPages"] = async ({
   const templates = "../gatsby-theme-blog-posts/src/templates";
   const blogPost = resolve(templates, "PostTemplate.tsx");
   const blogPage = resolve(templates, "PostsTemplate.tsx");
+  const authorPage = resolve(templates, "AuthorTemplate.tsx");
 
-  const postNodes = await fetchPosts({ graphql, skip: 0 });
+  const postPath = (title: string): string =>
+    `app/posts/${title.replace(/ /g, "-").toLowerCase()}/`;
+  const pagePath = (page: number): string =>
+    `app/posts${page === 0 ? "" : `/page/${page + 1}`}`;
+  const authorPagePath = (author: string, page: number): string =>
+    `app/author/${author.replace(/ /g, "-").toLowerCase()}${
+      page === 0 ? "" : `/page/${page + 1}`
+    }`;
 
-  postNodes.forEach(post => {
-    const title = post.title.replace(/ /g, "-").toLowerCase();
+  // Post pages
+  const postNodes = (await fetchPosts({ graphql, skip: 0 })).map(post => ({
+    authorPage: authorPagePath(post.author.name, 0),
+    ...post
+  }));
+  postNodes.forEach(post =>
     createPage({
-      path: `app/posts/${title}/`,
+      path: postPath(post.title),
       component: blogPost,
       context: {
-        id: post.id
+        id: post.id,
+        authorPath: post.authorPage
       }
-    });
-  });
+    })
+  );
 
-  const pagePath = (page: number): string => `app/posts/page/${page + 1}`;
+  // Post pagination
   const nodeChunks = chunk(postNodes, paginationSize);
-
-  nodeChunks.forEach((posts, index) => {
+  nodeChunks.forEach((posts, index) =>
     createPage({
       path: pagePath(index),
       component: blogPage,
@@ -86,6 +102,31 @@ export const createPages: GatsbyNode["createPages"] = async ({
         prevPath: index === 0 ? null : pagePath(index - 1),
         nextPath: index === nodeChunks.length - 1 ? null : pagePath(index + 1)
       }
-    });
+    })
+  );
+
+  // Authors pages
+  const authors = groupBy(postNodes, node => node.author.id);
+  Object.entries(authors).forEach(([authorId, postsNodes]) => {
+    const authorName = postsNodes[0].author.name;
+    const authorChunks = chunk(postsNodes, paginationSize);
+    Object.entries(authorChunks).forEach((posts, index) =>
+      createPage({
+        path: authorPagePath(authorName, index),
+        component: authorPage,
+        context: {
+          authorId,
+          posts,
+          currentPage: index,
+          pageSize: paginationSize,
+          pageCount: authorChunks.length,
+          prevPath: index === 0 ? null : authorPagePath(authorName, index - 1),
+          nextPath:
+            index === authorChunks.length - 1
+              ? null
+              : authorPagePath(authorName, index + 1)
+        }
+      })
+    );
   });
 };
