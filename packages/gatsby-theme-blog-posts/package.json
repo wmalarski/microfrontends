@@ -15,8 +15,7 @@
     "gatsby-plugin-page-creator": "^3.4.0",
     "gatsby-plugin-typescript": "^3.4.0",
     "gatsby-theme-blog-common": "*",
-    "gatsby-source-contentful": "^5.4.0",
-    "gatsby-plugin-graphql-codegen": "^2.7.1"
+    "gatsby-source-contentful": "^5.4.0"
   },
   "devDependencies": {
     "@types/react": "^17.0.4",

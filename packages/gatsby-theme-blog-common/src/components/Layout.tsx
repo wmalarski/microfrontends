@@ -1,3 +1,4 @@
+import { Link } from "gatsby";
 import React from "react";
 
 export interface LayoutProps {
@@ -10,6 +11,7 @@ export default function Layout(props: LayoutProps): JSX.Element {
   return (
     <div>
       <h1>Header</h1>
+      <Link to="/app/posts">Posts</Link>
       {children}
     </div>
   );

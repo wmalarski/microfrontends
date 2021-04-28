@@ -1,8 +1,13 @@
 import { graphql, PageProps } from "gatsby";
 import Layout from "gatsby-theme-blog-common/src/components/Layout";
 import React from "react";
+import AuthorCard from "../components/AuthorCard";
 import PostList from "../components/PostList";
-import { PageInfoContext, PostNode } from "../types";
+import { ContentfulAuthor, PageInfoContext, PostNode } from "../types";
+
+export interface AuthorTemplateData {
+  author: ContentfulAuthor;
+}
 
 export interface AuthorTemplateContext {
   posts: PostNode[];
@@ -10,14 +15,15 @@ export interface AuthorTemplateContext {
 }
 
 export default function AuthorTemplate(
-  props: PageProps<Record<string, never>, AuthorTemplateContext>
+  props: PageProps<AuthorTemplateData, AuthorTemplateContext>
 ): JSX.Element {
-  const { pageContext } = props;
+  const { pageContext, data } = props;
   const { posts, pageInfo } = pageContext;
+  const { author } = data;
 
   return (
     <Layout>
-      <pre>{JSON.stringify(props, null, 2)}</pre>
+      <AuthorCard author={author} />
       <PostList posts={posts} pageInfo={pageInfo} />
     </Layout>
   );
@@ -28,10 +34,10 @@ export const pageQuery = graphql`
     author: contentfulAuthor(id: { eq: $id }) {
       id
       name
+      createdAt
       biography {
         raw
       }
-      createdAt
     }
   }
 `;

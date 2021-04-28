@@ -7,8 +7,14 @@ import { chunk, groupBy } from "./src/utils";
 const requestPageSize = 100;
 const paginationSize = 10;
 
-async function fetchPosts({ graphql, skip }): Promise<PostNode[]> {
-  const result = await graphql(
+async function fetchPosts({
+  graphql,
+  skip
+}: {
+  graphql: Parameters<GatsbyNode["createPages"]>[0]["graphql"];
+  skip: number;
+}): Promise<PostNode[]> {
+  const result = await graphql<any>(
     `
       query MyQuery($limit: Int, $skip: Int) {
         allContentfulPost(limit: $limit, skip: $skip) {
@@ -19,6 +25,9 @@ async function fetchPosts({ graphql, skip }): Promise<PostNode[]> {
             id
             title
             createdAt
+            summary {
+              text: summary
+            }
             author {
               id
               name
@@ -33,7 +42,11 @@ async function fetchPosts({ graphql, skip }): Promise<PostNode[]> {
     }
   );
 
-  const posts = result.data.allContentfulPost;
+  const posts = result.data?.allContentfulPost;
+  if (!posts) {
+    return [];
+  }
+
   if (!posts.pageInfo.hasNextPage) {
     return posts.nodes;
   }

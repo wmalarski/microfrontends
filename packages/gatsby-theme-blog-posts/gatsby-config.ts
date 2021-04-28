@@ -7,7 +7,6 @@ config({
 
 export const plugins = [
   "gatsby-plugin-typescript",
-  `gatsby-plugin-graphql-codegen`,
   {
     resolve: "gatsby-plugin-page-creator",
     options: {
